@@ -108,6 +108,7 @@ def run_embedding_generation(data_path: str, output_path: str):
 
     # Save embeddings and processed data
      dump_pickle(scaler, os.path.join(output_path, "scaler.pkl"))
+        dump_pickle(word2vec_model, os.path.join(output_path, "word2vec_model.pkl"))
      dump_pickle((X_train, y_train), os.path.join(output_path, "train.pkl"))
      dump_pickle((X_test, y_test), os.path.join(output_path, "test.pkl"))
 
