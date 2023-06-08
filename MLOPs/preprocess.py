@@ -51,12 +51,12 @@ def generate_embeddings(tokens: List[str], word2vec_model)-> np.ndarray:
     help="Location of both the cleaned Quora train and test dataset CSV file"
 )
 @click.option(
-    "--output_path",
+    "--dest_path",
     help="Location where the resulting files will be saved"
 )
 
 
-def run_embedding_generation(data_path: str, output_path: str):
+def run_embedding_generation(data_path: str, dest_path: str):
     train_df: pd.DataFrame = read_dataframe(
         os.path.join(data_path, "traindf.csv")
     )
@@ -66,6 +66,7 @@ def run_embedding_generation(data_path: str, output_path: str):
 
     train_df = preprocess_data(train_df)
     test_df = preprocess_data(test_df)
+
 
     tokens = (
         train_df['question1_token'].tolist()
@@ -82,6 +83,12 @@ def run_embedding_generation(data_path: str, output_path: str):
         lambda tokens: generate_embeddings(tokens, word2vec_model)
     )
 
+    test_df['embedding_question1'] = test_df['question1_token'].apply(
+        lambda tokens: generate_embeddings(tokens, word2vec_model)
+    )
+    test_df['embedding_question2'] = test_df['question2_token'].apply(
+        lambda tokens: generate_embeddings(tokens, word2vec_model)
+    )
 
     # Calculate cosine similarity
     def cos_similarity(row):
@@ -124,13 +131,13 @@ def run_embedding_generation(data_path: str, output_path: str):
     X_test = pd.concat([test_quest1vec, test_quest2vec, test_scaled_data], axis=1)
 
     # Create output directory unless it already exists
-    os.makedirs(output_path, exist_ok=True)
+    os.makedirs(dest_path, exist_ok=True)
 
     # Save embeddings and processed data
-    dump_pickle(scaler, os.path.join(output_path, "scaler.pkl"))
-    dump_pickle(word2vec_model, os.path.join(output_path, "word2vec_model.pkl"))
-    dump_pickle((X_train, y_train), os.path.join(output_path, "train.pkl"))
-    dump_pickle((X_test, y_test), os.path.join(output_path, "test.pkl"))
+    dump_pickle(scaler, os.path.join(dest_path, "scaler.pkl"))
+    dump_pickle(word2vec_model, os.path.join(dest_path, "word2vec_model.pkl"))
+    dump_pickle((X_train, y_train), os.path.join(dest_path, "train.pkl"))
+    dump_pickle((X_test, y_test), os.path.join(dest_path, "test.pkl"))
 
 
 if __name__ == '__main__':
