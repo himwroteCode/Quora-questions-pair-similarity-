@@ -8,6 +8,7 @@ from optuna.samplers import TPESampler
 from sklearn.ensemble import StackingClassifier
 from sklearn.metrics import log_loss, f1_score, accuracy_score, recall_score
 
+
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
 mlflow.set_experiment("stacking-classifier-hyperopt")
 
@@ -28,6 +29,8 @@ def load_pickle(filename):
     default=5,
     help="The number of parameter evaluations for the optimizer to explore"
 )
+
+
 def run_optimization(data_path: str, num_trials: int):
 
     X_train, y_train = load_pickle(os.path.join(data_path, "train.pkl"))
